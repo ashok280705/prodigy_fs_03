@@ -5,13 +5,25 @@ import Footer from "@/components/Footer";
 
 export default function LayoutWrapper({ children }) {
   const pathname = usePathname();
-  const hideLayout = pathname === "/login"; // Or add `/register`
+  const hideLayout = pathname === "/login" || pathname === "/register";
 
   return (
-    <>
-      {!hideLayout && <Navbar />}
-      <main className="flex-grow">{children}</main>
-      {!hideLayout && <Footer />}
-    </>
+    <div className="flex flex-col min-h-screen">
+      {!hideLayout && (
+        <header className="bg-white shadow">
+          <Navbar />
+        </header>
+      )}
+
+      <main className="flex-1 overflow-y-auto w-full">
+        {children}
+      </main>
+
+      {!hideLayout && (
+        <footer className="bg-white shadow mt-8">
+          <Footer />
+        </footer>
+      )}
+    </div>
   );
 }

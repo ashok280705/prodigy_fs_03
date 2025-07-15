@@ -8,8 +8,10 @@ import Link from "next/link";
 export default function LoginPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
   useEffect(() => {
     if (session) {
@@ -17,11 +19,22 @@ export default function LoginPage() {
     }
   }, [session, router]);
 
-  const handleLogin = (e) => {
-    e.preventDefault();
-    // Add your custom credentials logic here if needed
-    console.log("Logging in with:", email, password);
-  };
+  const handleLogin = async (e) => {
+  e.preventDefault();
+  setError("");
+
+  const res = await signIn("credentials", {
+    redirect: false,
+    email,
+    password,
+  });
+
+  if (res.error) {
+    setError(res.error);
+  } else {
+    router.push("/Prodigy-store");
+  }
+};
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-gray-100">
@@ -52,6 +65,7 @@ export default function LoginPage() {
               required
             />
           </div>
+          {error && <p className="text-red-600 text-sm">{error}</p>}
           <button
             type="submit"
             className="w-full bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-700"

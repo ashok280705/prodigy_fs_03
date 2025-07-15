@@ -5,14 +5,28 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  username: {
+    type: String,
+    unique: true, // prevent duplicate usernames
+  },
   email: {
     type: String,
     required: true,
-    unique: true,
+    unique: true, // prevent duplicate emails
+  },
+  phone: {
+    type: String,
+    unique: true, // optional, but usually phone numbers are unique
+    sparse: true, // allow multiple docs with `phone: null`
   },
   password: {
     type: String,
-    required: true,
+    // ✅ Make NOT required: Google sign-in will not have this
+  },
+  image: {
+    type: String,
   },
 });
-export const User = mongoose.models.User || mongoose.model("User", userSchema);
+
+// Prevent overwrite in dev
+export default mongoose.models.User || mongoose.model("User", userSchema);
