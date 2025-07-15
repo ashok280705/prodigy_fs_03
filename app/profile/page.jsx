@@ -33,7 +33,7 @@ export default function ProfilePage() {
     setLoading(true);
     setMessage("");
 
-    const res = await fetch("/api/user", {
+    const res = await fetch("/api/users", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(form),
