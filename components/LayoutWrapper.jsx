@@ -5,7 +5,7 @@ import Footer from "@/components/Footer";
 
 export default function LayoutWrapper({ children }) {
   const pathname = usePathname();
-  const hideLayout = pathname === "/login" || pathname === "/register";
+  const hideLayout = pathname === "/login" || pathname === "/register" || pathname === "/admin-login";
 
   return (
     <div className="flex flex-col min-h-screen">

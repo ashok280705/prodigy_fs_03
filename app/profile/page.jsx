@@ -95,6 +95,8 @@ export default function ProfilePage() {
             value={form.phone || " "}
             onChange={handleChange}
             className="w-full border p-2 rounded"
+             maxLength={10} 
+             minLength={10}
           />
         </div>
 
