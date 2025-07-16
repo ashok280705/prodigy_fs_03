@@ -50,17 +50,30 @@ export default function Page() {
     page * itemsPerPage
   );
 
-  const handleAddToCart = (product) => {
-    alert(`🛒 ${product.name} added to cart!`);
-  };
+ const handleAddToCart = async (product) => {
+  const res = await fetch("/api/cart", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      productId: product._id, // or product.id depending on your schema
+      quantity: 1,            // default to 1, or pass your desired quantity
+    }),
+  });
 
+  if (res.ok) {
+    alert("✅ Added to cart!");
+  } else {
+    alert("❌ Failed to add to cart.");
+  }
+};
   return (
     <main className="max-w-7xl mx-auto px-6 py-10">
       <h1 className="text-4xl font-bold text-center mb-10 text-blue-700">
         🛍️ Prodigy Store
       </h1>
 
-      {/* Filters */}
      {/* Filters */}
 <div className="flex flex-wrap gap-6 justify-center mb-10">
   <div className="flex flex-col">

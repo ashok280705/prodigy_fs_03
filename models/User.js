@@ -29,6 +29,18 @@ const userSchema = new mongoose.Schema({
   image: {
     type: String,
   },
+  cart: [
+    {
+      productId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Product",
+      },
+      quantity: {
+        type: Number,
+        default: 1,
+      },
+    },
+  ],
 });
 
 // Prevent overwrite in dev
