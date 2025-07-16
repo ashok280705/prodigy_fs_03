@@ -86,6 +86,7 @@ export async function PATCH(req) {
 
   if (existing) {
     existing.quantity += quantity;
+
     if (existing.quantity <= 0) {
       user.cart = user.cart.filter(
         (item) => item.productId.toString() !== productId
