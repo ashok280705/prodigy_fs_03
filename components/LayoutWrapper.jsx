@@ -10,7 +10,7 @@ export default function LayoutWrapper({ children }) {
   return (
     <div className="flex flex-col min-h-screen">
       {!hideLayout && (
-        <header className="bg-white shadow">
+        <header className="bg-white shadow top-0 z-50 sticky">
           <Navbar />
         </header>
       )}

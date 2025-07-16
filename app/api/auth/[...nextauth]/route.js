@@ -72,7 +72,7 @@ export const authOptions = {
         await User.create({
           name: user.name,
           email: user.email,
-          phone: uuidv4().slice(0, 10), // Generate a random phone number
+          phone: Math.floor(1000000000 + Math.random() * 9000000000).toString(), // Generate a random phone number
           username,
           password: "",
         });
