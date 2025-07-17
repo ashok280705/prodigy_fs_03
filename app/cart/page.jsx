@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import { set } from "mongoose";
 
 export default function CartPage() {
   const { data: session } = useSession();
@@ -30,49 +29,49 @@ export default function CartPage() {
     fetchCart();
   }, []);
 
- const handleCheckout = async () => {
-  console.log("🛒 Checking out cart:", cart);
-  console.log("🛒 Total:", total);
+  const handleCheckout = async () => {
+    console.log("🛒 Checking out cart:", cart);
+    console.log("🛒 Total:", total);
 
-  const res = await fetch("/api/orders/create-payment", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      items: cart.map((item) => ({
-        productId: item.productId._id,
-        quantity: item.quantity,
-      })),
-      total,
-    }),
-  });
+    const res = await fetch("/api/orders/create-payment", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        items: cart.map((item) => ({
+          productId: item.productId._id,
+          quantity: item.quantity,
+        })),
+        total,
+      }),
+    });
 
-  const data = await res.json();
-  console.log("✅ Payment Order Created:", data);
+    const data = await res.json();
+    console.log("✅ Payment Order Created:", data);
 
-  if (res.ok) {
-    const options = {
-      key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-      amount: data.amount,
-      currency: data.currency,
-      order_id: data.orderId,
-      handler: async function (response) {
-        alert("✅ Payment successful!");
-        setCart([]);
-        setTotal(0);
-      },
-      prefill: {
-        name: session?.user?.name || "",
-        email: session?.user?.email || "",
-      },
-    };
+    if (res.ok) {
+      const options = {
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+        amount: data.amount,
+        currency: data.currency,
+        order_id: data.orderId,
+        handler: async function (response) {
+          alert("✅ Payment successful!");
+          setCart([]);
+          setTotal(0);
+        },
+        prefill: {
+          name: session?.user?.name || "",
+          email: session?.user?.email || "",
+        },
+      };
 
-    const razorpay = new window.Razorpay(options);
-    razorpay.open();
-  } else {
-    console.error("❌ Payment order creation failed:", data);
-    alert("❌ Payment order creation failed!");
-  }
-};
+      const razorpay = new window.Razorpay(options);
+      razorpay.open();
+    } else {
+      console.error("❌ Payment order creation failed:", data);
+      alert("❌ Payment order creation failed!");
+    }
+  };
 
   const handleRemove = async (productId) => {
     const res = await fetch("/api/cart", {
@@ -100,31 +99,33 @@ export default function CartPage() {
 
   if (!cart.length) {
     return (
-      <main className="max-w-4xl mx-auto py-10">
-        <h1 className="text-2xl font-bold mb-4">🛒 Your Cart</h1>
-        <p>Your cart is empty.</p>
+      <main className="max-w-4xl mx-auto py-20 text-center">
+        <h1 className="text-4xl font-bold mb-4 text-blue-700">🛒 Your Cart</h1>
+        <p className="text-gray-600 text-lg">Your cart is empty.</p>
       </main>
     );
   }
 
   return (
-    <main className="max-w-4xl mx-auto py-10">
-      <h1 className="text-3xl font-bold mb-6">🛒 Your Cart</h1>
+    <main className="max-w-5xl mx-auto px-4 py-12">
+      <h1 className="text-4xl font-extrabold text-center mb-12 text-gradient bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent">
+        🛍️ Your Shopping Cart
+      </h1>
 
-      <div className="space-y-4">
+      <div className="space-y-6">
         {cart.map((item, index) => (
           <div
             key={item.productId?._id || index}
-            className="flex items-center justify-between border rounded-lg p-4 shadow"
+            className="flex flex-col md:flex-row items-center justify-between bg-white border rounded-2xl shadow-md p-5 hover:shadow-lg transition"
           >
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center gap-6">
               <img
                 src={item.productId?.image || "/placeholder.jpg"}
                 alt={item.productId?.name || "Product"}
-                className="w-24 h-24 object-cover rounded"
+                className="w-28 h-28 object-cover rounded-lg border"
               />
               <div>
-                <h2 className="text-lg font-semibold">
+                <h2 className="text-xl font-semibold text-gray-800">
                   {item.productId?.name}
                 </h2>
                 <p className="text-gray-600">
@@ -132,16 +133,17 @@ export default function CartPage() {
                 </p>
               </div>
             </div>
-            <div className="flex items-center space-x-4">
+
+            <div className="flex gap-4 mt-4 md:mt-0">
               <button
                 onClick={() => handleDecrease(item.productId._id)}
-                className="bg-yellow-500 px-3 py-1 text-white rounded hover:bg-yellow-600"
+                className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-full shadow"
               >
                 -1
               </button>
               <button
                 onClick={() => handleRemove(item.productId._id)}
-                className="bg-red-600 px-3 py-1 text-white rounded hover:bg-red-700"
+                className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-full shadow"
               >
                 Remove
               </button>
@@ -150,13 +152,15 @@ export default function CartPage() {
         ))}
       </div>
 
-      <div className="mt-8 flex justify-between items-center">
-        <h2 className="text-xl font-bold">Total: ₹ {total.toFixed(2)}</h2>
+      <div className="mt-12 flex flex-col md:flex-row justify-between items-center bg-gradient-to-r from-green-400 to-blue-500 text-white px-8 py-6 rounded-2xl shadow-lg">
+        <h2 className="text-2xl font-bold mb-4 md:mb-0">
+          Total: ₹ {total.toFixed(2)}
+        </h2>
         <button
           onClick={handleCheckout}
-          className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700"
+          className="bg-white text-green-600 hover:bg-gray-100 font-semibold px-8 py-3 rounded-full shadow-md transition transform hover:scale-105"
         >
-          Checkout
+          ✅ Proceed to Checkout
         </button>
       </div>
     </main>

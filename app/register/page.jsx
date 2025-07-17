@@ -41,9 +41,9 @@ export default function RegisterPage() {
       if (!res.ok) {
         setError(data.error || "Registration failed");
       } else {
-        setSuccess("Registration successful! Redirecting to login...");
+        setSuccess("✅ Registration successful! Redirecting to login...");
         setTimeout(() => {
-          router.push("/login"); // ✅ Adjust if your login route is different
+          router.push("/login");
         }, 2000);
       }
     } catch (err) {
@@ -53,9 +53,11 @@ export default function RegisterPage() {
   };
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-gray-100">
-      <div className="w-full max-w-md p-8 bg-white rounded-2xl shadow-md">
-        <h1 className="text-2xl font-bold mb-6 text-center">Create your account</h1>
+    <main className="flex min-h-screen items-center justify-center bg-gradient-to-br from-green-50 to-green-100 px-4">
+      <div className="w-full max-w-md p-8 bg-white rounded-3xl shadow-2xl">
+        <h1 className="text-3xl font-extrabold mb-6 text-center bg-gradient-to-r from-green-600 to-green-400 text-transparent bg-clip-text">
+          Create your account
+        </h1>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -66,7 +68,7 @@ export default function RegisterPage() {
               value={form.name}
               onChange={handleChange}
               required
-              className="w-full border border-gray-300 rounded-lg p-2"
+              className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-green-400"
             />
           </div>
 
@@ -78,7 +80,7 @@ export default function RegisterPage() {
               value={form.username}
               onChange={handleChange}
               required
-              className="w-full border border-gray-300 rounded-lg p-2"
+              className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-green-400"
             />
           </div>
 
@@ -90,7 +92,7 @@ export default function RegisterPage() {
               value={form.email}
               onChange={handleChange}
               required
-              className="w-full border border-gray-300 rounded-lg p-2"
+              className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-green-400"
             />
           </div>
 
@@ -102,7 +104,9 @@ export default function RegisterPage() {
               value={form.phone}
               onChange={handleChange}
               required
-              className="w-full border border-gray-300 rounded-lg p-2"
+              maxLength={10}
+              minLength={10}
+              className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-green-400"
             />
           </div>
 
@@ -114,24 +118,24 @@ export default function RegisterPage() {
               value={form.password}
               onChange={handleChange}
               required
-              className="w-full border border-gray-300 rounded-lg p-2"
+              className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-green-400"
             />
           </div>
 
           {error && <p className="text-red-600 text-sm">{error}</p>}
-          {success && <p className="text-green-600 text-sm">{success}</p>}
+          {success && <p className="text-green-700 text-sm">{success}</p>}
 
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-700"
+            className="w-full bg-gradient-to-r from-green-600 to-green-400 text-white py-3 rounded-lg font-semibold hover:opacity-90 transition"
           >
             Register
           </button>
         </form>
 
-        <p className="mt-4 text-center text-sm text-gray-600">
+        <p className="mt-6 text-center text-sm text-gray-600">
           Already have an account?{" "}
-          <a href="/login" className="text-blue-600 hover:underline">
+          <a href="/login" className="text-green-600 hover:underline font-medium">
             Login here
           </a>
         </p>

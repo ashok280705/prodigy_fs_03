@@ -15,7 +15,6 @@ export default function AdminLoginPage() {
     e.preventDefault();
     setError("");
 
-    // Only allow hardcoded credentials
     if (
       email === "Admin@prodigystore.com" &&
       password === "Wtmg2135@"
@@ -37,9 +36,11 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-gray-100">
-      <div className="w-full max-w-md p-8 bg-white rounded-2xl shadow-md">
-        <h1 className="text-2xl font-bold mb-6 text-center">Admin Login</h1>
+    <main className="flex min-h-screen items-center justify-center bg-gradient-to-br from-green-100 to-green-200">
+      <div className="w-full max-w-md p-8 bg-white rounded-3xl shadow-2xl">
+        <h1 className="text-3xl font-extrabold mb-6 text-center bg-gradient-to-r from-green-600 to-green-400 text-transparent bg-clip-text">
+          Admin Login
+        </h1>
 
         <form onSubmit={handleAdminLogin} className="space-y-4">
           <div>
@@ -48,7 +49,7 @@ export default function AdminLoginPage() {
             </label>
             <input
               type="email"
-              className="w-full border border-gray-300 rounded-lg p-2"
+              className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-green-500"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -60,18 +61,20 @@ export default function AdminLoginPage() {
             </label>
             <input
               type="password"
-              className="w-full border border-gray-300 rounded-lg p-2"
+              className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-green-500"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
             />
           </div>
+
           {error && (
             <p className="text-red-600 text-sm">{error}</p>
           )}
+
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-700"
+            className="w-full bg-green-600 text-white p-3 rounded-lg font-semibold hover:bg-green-700 transition-colors"
           >
             Login as Admin
           </button>
