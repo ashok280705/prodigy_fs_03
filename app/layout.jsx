@@ -23,6 +23,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <head>
+        <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
         <Script src="https://cdn.lordicon.com/lordicon.js" strategy="beforeInteractive" />
       </head>
       <body

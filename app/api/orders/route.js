@@ -6,41 +6,43 @@ import User from "@/models/User";
 import Order from "@/models/Orders";
 
 export async function POST(req) {
-  await connectDB();
-  const session = await getServerSession(authOptions);
+  try {
+    await connectDB();
 
-  if (!session) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user || !session.user.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const userId = session.user.id;
+
+    const { cart, total } = await req.json();
+
+    if (!Array.isArray(cart) || cart.length === 0) {
+      return NextResponse.json({ error: "Cart is empty" }, { status: 400 });
+    }
+
+    const newOrder = await Order.create({
+      userId,   // ✅ must be valid Mongo ID string
+      items: cart.map(item => ({
+        productId: item.productId,
+        quantity: item.quantity
+      })),
+      total,
+      status: "Placed"
+    });
+
+    // Optional: attach order ref to user
+    await User.findByIdAndUpdate(userId, {
+      $push: { orders: newOrder._id }
+    });
+
+    return NextResponse.json({ order: newOrder });
+
+  } catch (err) {
+    console.error(err);
+    return NextResponse.json({ error: err.message }, { status: 500 });
   }
-
-  const user = await User.findOne({ email: session.user.email }).populate("cart.productId");
-
-  if (!user.cart.length) {
-    return NextResponse.json({ error: "Cart is empty" }, { status: 400 });
-  }
-
-  const total = user.cart.reduce(
-    (sum, item) => sum + item.productId.price * item.quantity,
-    0
-  );
-
-  const newOrder = await Order.create({
-    userId: user._id,
-    items: user.cart.map((item) => ({
-      productId: item.productId._id,
-      quantity: item.quantity,
-    })),
-    total,
-  });
-
-  // Optional: save order ID in user for easy lookup
-  user.orders.push(newOrder._id);
-
-  // Empty the cart
-  user.cart = [];
-  await user.save();
-
-  return NextResponse.json({ message: "Order placed", order: newOrder });
 }
 export async function GET(req) {
   await connectDB();

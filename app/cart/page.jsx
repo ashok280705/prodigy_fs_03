@@ -1,8 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
+import { set } from "mongoose";
 
 export default function CartPage() {
+  const { data: session } = useSession();
   const [cart, setCart] = useState([]);
   const [total, setTotal] = useState(0);
 
@@ -10,8 +13,8 @@ export default function CartPage() {
     const res = await fetch("/api/cart");
     if (res.ok) {
       const data = await res.json();
-      setCart(data.cart);
-      calculateTotal(data.cart);
+      setCart(data.cart || []);
+      calculateTotal(data.cart || []);
     }
   };
 
@@ -27,22 +30,49 @@ export default function CartPage() {
     fetchCart();
   }, []);
 
+ const handleCheckout = async () => {
+  console.log("🛒 Checking out cart:", cart);
+  console.log("🛒 Total:", total);
 
-    const handleCheckout = async () => {
-      const res = await fetch("/api/orders", {
-        method: "POST",
-      });
+  const res = await fetch("/api/orders/create-payment", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      items: cart.map((item) => ({
+        productId: item.productId._id,
+        quantity: item.quantity,
+      })),
+      total,
+    }),
+  });
 
-      if (res.ok) {
-        alert("✅ Order placed!");
-        // Optionally reload or redirect
-        window.location.reload();
-      } else {
-        const data = await res.json();
-        alert("❌ " + data.error);
-      }
+  const data = await res.json();
+  console.log("✅ Payment Order Created:", data);
+
+  if (res.ok) {
+    const options = {
+      key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+      amount: data.amount,
+      currency: data.currency,
+      order_id: data.orderId,
+      handler: async function (response) {
+        alert("✅ Payment successful!");
+        setCart([]);
+        setTotal(0);
+      },
+      prefill: {
+        name: session?.user?.name || "",
+        email: session?.user?.email || "",
+      },
     };
-  
+
+    const razorpay = new window.Razorpay(options);
+    razorpay.open();
+  } else {
+    console.error("❌ Payment order creation failed:", data);
+    alert("❌ Payment order creation failed!");
+  }
+};
 
   const handleRemove = async (productId) => {
     const res = await fetch("/api/cart", {

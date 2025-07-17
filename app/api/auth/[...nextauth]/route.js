@@ -1,10 +1,12 @@
+// app/api/auth/[...nextauth]/route.js
+
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import connectDB from "@/lib/db";
 import User from "@/models/User";
 import bcrypt from "bcryptjs";
-import { v4 as uuidv4 } from 'uuid';
+
 export const authOptions = {
   providers: [
     CredentialsProvider({
@@ -14,7 +16,8 @@ export const authOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        // ✅ Hardcoded Admin check
+        await connectDB();
+
         if (
           credentials.email === "Admin@prodigystore.com" &&
           credentials.password === "Wtmg2135@"
@@ -26,8 +29,6 @@ export const authOptions = {
           };
         }
 
-        // ✅ Normal user check
-        await connectDB();
         const user = await User.findOne({ email: credentials.email });
         if (!user) return null;
 
@@ -38,7 +39,7 @@ export const authOptions = {
         if (!isPasswordCorrect) return null;
 
         return {
-          id: user._id,
+          id: user._id.toString(),
           name: user.name,
           email: user.email,
         };
@@ -49,31 +50,54 @@ export const authOptions = {
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     }),
   ],
-  session: {
-    strategy: "jwt",
-  },
+
+  session: { strategy: "jwt" },
   secret: process.env.NEXTAUTH_SECRET,
+
   callbacks: {
-    async signIn({ user, account, profile }) {
+    async jwt({ token, user }) {
       await connectDB();
 
-      // If Google login, sync user to DB
-      const existingUser = await User.findOne({ email: user.email });
-      if (!existingUser) {
-        let baseUsername = user.name?.split(" ").join("").toLowerCase() || "user";
-        let username = baseUsername;
+      // When logging in:
+      if (user) {
+        if (user.id?.length === 24) {
+          token.id = user.id;
+        } else {
+          // Google login fallback
+          const dbUser = await User.findOne({ email: user.email });
+          token.id = dbUser?._id?.toString();
+        }
+      }
 
+      return token;
+    },
+
+    async session({ session, token }) {
+      if (token?.id) {
+        session.user.id = token.id;
+      }
+      return session;
+    },
+
+    async signIn({ user }) {
+      await connectDB();
+      const existingUser = await User.findOne({ email: user.email });
+
+      if (!existingUser) {
+        let baseUsername =
+          user.name?.split(" ").join("").toLowerCase() || "user";
+        let username = baseUsername;
         let count = 1;
+
         while (await User.findOne({ username })) {
-          username = `${baseUsername}${count}`;
-          count++;
+          username = `${baseUsername}${count++}`;
         }
 
         await User.create({
           name: user.name,
           email: user.email,
-          phone: Math.floor(1000000000 + Math.random() * 9000000000).toString(), // Generate a random phone number
           username,
+          phone: Math.floor(1000000000 + Math.random() * 9000000000).toString(),
           password: "",
         });
       }
@@ -82,5 +106,6 @@ export const authOptions = {
     },
   },
 };
+
 const handler = NextAuth(authOptions);
 export { handler as GET, handler as POST };
