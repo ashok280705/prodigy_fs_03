@@ -29,28 +29,29 @@ export default function Navbar() {
       </div>
 
       <div className="flex items-center gap-6 relative">
-        <Link href="/products" className="hover:underline">
-          Products
+        <Link href="/Prodigy-store" className="hover:underline">
+          Home
         </Link>
         <Link href="/cart" className="hover:underline">
           Cart
         </Link>
-
+        <Link href="/order" className="hover:underline">
+          Orders
+        </Link>
         {session ? (
           <div className="relative" ref={dropdownRef}>
             <button
               onClick={() => setOpen(!open)}
               className="w-10 h-10 rounded-full overflow-hidden border-2 border-gray-300 flex items-center justify-center bg-gray-50"
             >
-             
               <lord-icon
-                  src="https://cdn.lordicon.com/shcfcebj.json"
-                  trigger="hover"
-                  stroke="bold"
-                  state="hover-jump"
-                  colors="primary:#121331,secondary:#000000"
-                  style={{ width: "40px", height: "40px" }}
-                ></lord-icon>
+                src="https://cdn.lordicon.com/shcfcebj.json"
+                trigger="hover"
+                stroke="bold"
+                state="hover-jump"
+                colors="primary:#121331,secondary:#000000"
+                style={{ width: "40px", height: "40px" }}
+              ></lord-icon>
             </button>
 
             {open && (

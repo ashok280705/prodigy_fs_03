@@ -27,9 +27,22 @@ export default function CartPage() {
     fetchCart();
   }, []);
 
-  const handleCheckout = async () => {
-    alert("✅ Order placed! (Stub)");
-  };
+
+    const handleCheckout = async () => {
+      const res = await fetch("/api/orders", {
+        method: "POST",
+      });
+
+      if (res.ok) {
+        alert("✅ Order placed!");
+        // Optionally reload or redirect
+        window.location.reload();
+      } else {
+        const data = await res.json();
+        alert("❌ " + data.error);
+      }
+    };
+  
 
   const handleRemove = async (productId) => {
     const res = await fetch("/api/cart", {
@@ -81,7 +94,9 @@ export default function CartPage() {
                 className="w-24 h-24 object-cover rounded"
               />
               <div>
-                <h2 className="text-lg font-semibold">{item.productId?.name}</h2>
+                <h2 className="text-lg font-semibold">
+                  {item.productId?.name}
+                </h2>
                 <p className="text-gray-600">
                   ₹ {item.productId?.price} × {item.quantity}
                 </p>
