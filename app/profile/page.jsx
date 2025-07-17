@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-
+import { useSession } from "next-auth/react";
+import { redirect } from 'next/navigation';
 export default function ProfilePage() {
+    const { data: session, status } = useSession();
   const [form, setForm] = useState({
     name: "",
     username: "",
@@ -13,6 +15,10 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
 
+  useEffect(() => {
+      if (status === "loading") return;
+      if (status === "unauthenticated") redirect("/login");
+    }, [status]);
  useEffect(() => {
   const fetchProfile = async () => {
     const res = await fetch("/api/users");
@@ -22,7 +28,7 @@ export default function ProfilePage() {
     }
   };
   fetchProfile();
-}, []);
+}, [status]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });

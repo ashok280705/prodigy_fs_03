@@ -1,9 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
-
+import { useSession } from "next-auth/react";
+import { redirect } from 'next/navigation';
 export default function OrdersPage() {
+      const { data: session, status } = useSession();
   const [orders, setOrders] = useState([]);
+  useEffect(() => {
+      if (status === "loading") return;
+      if (status === "unauthenticated") redirect("/login");
+    }, [status]);
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -15,7 +21,7 @@ export default function OrdersPage() {
     };
 
     fetchOrders();
-  }, []);
+  }, [status]);
 
   if (!orders.length) {
     return (
